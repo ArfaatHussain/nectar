@@ -9,10 +9,11 @@ import Location from './src/screens/auth/Location';
 import LocationSearch from './src/screens/auth/LocationSearch';
 import AppNavigation from './src/navigations/AppNavigation';
 import Register from './src/screens/auth/Register';
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 export default function App() {
   return (
-   
+    <GestureHandlerRootView style={{ flex: 1 }} >
+
       <PaperProvider>
         <SafeAreaProvider style={{ flex: 1 }} >
           <SafeAreaView style={styles.container}>
@@ -23,7 +24,9 @@ export default function App() {
           </SafeAreaView>
         </SafeAreaProvider>
       </PaperProvider>
-  
+
+    </GestureHandlerRootView>
+
   );
 }
 

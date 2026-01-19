@@ -1,25 +1,40 @@
 import { View, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native'
-import React, { useCallback, useState, useRef } from 'react'
+import React, { useCallback, useState, useRef, useMemo } from 'react'
 import { Text } from 'react-native-paper'
 import { getDimensions } from '../../utils/getDimensions'
-import { AntDesign, Entypo } from "@expo/vector-icons";
+import { AntDesign, Entypo, MaterialIcons } from "@expo/vector-icons";
 import CustomButton from '../../components/Button';
-import { useFocusEffect } from '@react-navigation/native';
 const { height, width } = getDimensions()
 import useStore from '../../store/useStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 const Cart = ({ navigation }) => {
   const { cart, setCart } = useStore()
-  console.log("Cart from store: ", cart)
 
-  // ref
-  // const bottomSheetRef = useRef(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [totalCost, setTotalCost] = useState(0)
 
-  // callbacks
+  const bottomSheetRef = useRef(null);
+
+  const snapPoints = useMemo(() => ['50%'], []);
   const handleSheetChanges = useCallback((index) => {
-    console.log('handleSheetChanges', index);
+    if (index === -1) {
+      setSheetOpen(false);
+    }
   }, []);
+
+  const openSheet = () => {
+
+    let cost = 0;
+    cart.map((item) => {
+      cost += (item.price * item.quantity)
+    })
+
+    setTotalCost(cost)
+    setSheetOpen(true); // hide button immediately
+    bottomSheetRef.current?.snapToIndex(0);
+  };
+
 
   const increment = (id) => {
     setCart(
@@ -48,6 +63,19 @@ const Cart = ({ navigation }) => {
     setCart(filteredCart)
     await AsyncStorage.setItem("cart", JSON.stringify(filteredCart))
   }
+
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+        opacity={0.5}
+      />
+    ),
+    []
+  );
+
 
 
   return (
@@ -117,21 +145,92 @@ const Cart = ({ navigation }) => {
         )}
       />
 
-      {/* <BottomSheet
-        // ref={bottomSheetRef}
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        backdropComponent={renderBackdrop}
         onChange={handleSheetChanges}
       >
         <BottomSheetView style={styles.contentContainer}>
-          <Text>Awesome 🎉</Text>
+          <Text variant="headlineMedium">Checkout</Text>
+
+          <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center' }} >
+            <Text variant='bodyLarge' style={{ color: '#808080', flex: 1 }} >Delivery</Text>
+            <TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                <Text variant='labelLarge' style={{ marginRight: 10 }} >Select Method</Text>
+                <AntDesign name="right" size={width * 0.05} color="black" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+
+          <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center' }} >
+            <Text variant='bodyLarge' style={{ color: '#808080', flex: 1 }} >Payment</Text>
+            <TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                <Image source={require('../../../assets/images/card.png')}
+                  style={{ height: height * 0.05, width: width * 0.07, resizeMode: 'contain', marginRight: 10 }}
+                />
+                <AntDesign name="right" size={width * 0.05} color="black" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+
+          <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center' }} >
+            <Text variant='bodyLarge' style={{ color: '#808080', flex: 1 }} >Promo Code</Text>
+            <TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                <Text variant='labelLarge' style={{ marginRight: 10 }} >Pick discount</Text>
+                <AntDesign name="right" size={width * 0.05} color="black" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center' }} >
+            <Text variant='bodyLarge' style={{ color: '#808080', flex: 1 }} >Total Cost</Text>
+            <TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                <Text variant='labelLarge' style={{ marginRight: 10 }} >Rs {totalCost}</Text>
+                <AntDesign name="right" size={width * 0.05} color="black" />
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={{ color: '#808080', marginTop: 30 }} >By placing an order you agree to our <Text style={{ color: '#53B175' }} >Terms</Text> and  <Text style={{ color: '#53B175' }} >Conditions</Text></Text>
+
+          <CustomButton
+            buttonText={"Place Order"}
+            style={{ width: '100%', alignSelf: 'center', marginTop: 30 }}
+            onPress={async () => {
+              setCart([]);
+              await AsyncStorage.removeItem("cart");
+
+              // let the close animation start, then navigate
+              setTimeout(() => {
+                navigation.getParent()?.navigate("order-accepted");
+              }, 150);
+
+              bottomSheetRef.current?.close();
+              setSheetOpen(false);
+            }}
+          />
+
         </BottomSheetView>
-      </BottomSheet> */}
+      </BottomSheet>
 
-      <CustomButton
-        buttonText={"Checkout"}
-        style={{ width: '90%', alignSelf: 'center' }}
+      {!sheetOpen && (
+        <CustomButton
+          buttonText="Checkout"
+          style={{ width: '90%', alignSelf: 'center' }}
+          onPress={openSheet}
+          disabled={cart?.length === 0 ? true : false}
 
-      />
-
+        />
+      )}
 
     </View>
   )
@@ -142,6 +241,13 @@ export default Cart
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   header: { textAlign: 'center', marginVertical: 15 },
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 36,
+    backgroundColor: '#fff',
+    zIndex: 10,
+    paddingBottom: 10
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',

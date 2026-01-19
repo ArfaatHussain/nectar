@@ -74,7 +74,7 @@ const Favourite = ({ navigation }) => {
         favourites.length > 0 && <CustomButton
           buttonText={"Add All To Cart"}
           style={{ alignSelf: 'center', width: '90%' }}
-          onPress={()=>navigation.getParent()?.navigate("order-accepted")}
+          
         />
       }
 

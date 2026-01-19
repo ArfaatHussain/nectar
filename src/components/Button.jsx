@@ -9,11 +9,13 @@ const CustomButton = ({
   buttonText,
   rippleColor,
   onPress,
-  textColor
+  textColor,
+  disabled
 }) => {
   return (
     <Button
       mode={mode}
+      disabled={disabled || false}
       {...(mode === "contained" && {
         buttonColor: buttonColor || "#53B175",
       })}
