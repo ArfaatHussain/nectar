@@ -10,6 +10,7 @@ const { width, height } = getDimensions();
 import useStore from '../../store/useStore'
 import { useFocusEffect } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Card from '../../components/Card'
 const DOT_SIZE = width * 0.018;        // adjust multiplier if needed
 const DOT_RADIUS = DOT_SIZE / 2;
 const DOT_SPACING = width * 0.01;
@@ -195,28 +196,7 @@ const Home = ({ navigation }) => {
                 }}
                 onPress={() => handleNavigation(item)}
               >
-                <View>
-                  <Image
-                    source={{ uri: item.image }}
-                    style={{
-                      width: width * 0.3,
-                      height: height * 0.15,
-                      borderRadius: 10,
-                      alignSelf: 'center',
-                    }}
-                  />
-                  <Text variant='titleSmall' style={{ marginTop: 5 }}>{item.name}</Text>
-                  <Text variant='bodyMedium' style={{ color: '#808080' }}>{item.unitValue} {item.unit}</Text>
-
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }}>
-                    <Text variant='titleSmall'>Rs {item.price}</Text>
-                    <TouchableOpacity
-                      activeOpacity={0.5}
-                      style={{ backgroundColor: '#53B175', padding: 5, borderRadius: 10 }}>
-                      <Ionicons name="add" size={height * 0.025} color="#fff" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                <Card item={item} />
               </Pressable>
             )}
             keyExtractor={(item) => item.id.toString()}

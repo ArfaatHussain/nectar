@@ -9,7 +9,7 @@ import Favourite from "../screens/bottom-tabs/Favourite";
 import Explore from "../screens/bottom-tabs/Explore";
 import Cart from "../screens/bottom-tabs/Cart";
 import { getDimensions } from "../utils/getDimensions";
-
+import { DrawerToggleButton } from "@react-navigation/drawer";
 
 const { height, width } = getDimensions();
 const Tab = createBottomTabNavigator();
