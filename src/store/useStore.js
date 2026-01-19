@@ -3,7 +3,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const useStore = create((set) => ({
   user: null,
   setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
+  clearUser: async() => {
+    set({user: null});
+    await AsyncStorage.removeItem("user");
+
+  },
 
   cart: [],
   // Add new product or update existing

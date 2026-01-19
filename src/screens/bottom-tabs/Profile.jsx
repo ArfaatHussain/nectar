@@ -4,10 +4,14 @@ import { Text, Avatar } from 'react-native-paper';
 import useStore from '../../store/useStore';
 import { getDimensions } from '../../utils/getDimensions';
 import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-
 const { height, width } = getDimensions();
 
-const menuItems = [
+const Profile = ({navigation}) => {
+  const user = useStore((state) => state.user);
+  const clearUser = useStore((state)=>state.clearUser)
+  
+
+  const menuItems = [
   { label: 'Orders', icon: <Feather name="shopping-bag" /> },
   { label: 'My Details', icon: <MaterialCommunityIcons name="card-account-details-outline" /> },
   { label: 'Delivery Address', icon: <MaterialCommunityIcons name="map-marker-outline" /> },
@@ -16,11 +20,13 @@ const menuItems = [
   { label: 'Notifications', icon: <MaterialCommunityIcons name="bell-outline" /> },
   { label: 'Help', icon: <MaterialCommunityIcons name="help-circle-outline" /> },
   { label: 'About', icon: <MaterialCommunityIcons name="information-outline" /> },
-  { label: 'Logout', icon: <MaterialCommunityIcons name="logout" /> },
+  { label: 'Logout', icon: <MaterialCommunityIcons name="logout" />,
+    onPress: ()=>{
+      clearUser();
+      navigation.getParent()?.replace("auth",{screen:"login"})
+    }
+   },
 ];
-
-const Profile = () => {
-  const user = useStore((state) => state.user);
 
   return (
     <View style={styles.container}>
